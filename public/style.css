@@ -499,3 +499,14 @@ a.chip { text-decoration: none; }
   .sp-metrics .v { font-size: 20px; }
   #themeLabel { display: none; }
 }
+
+.about-card p { margin: 0; max-width: 82ch; line-height: 1.75; }
+.about-card p + p { margin-top: 8px; }
+.about-card h3 { margin-bottom: 10px; }
+.faq-card details { border-top: 1px solid var(--line); padding: 10px 0; }
+.faq-card details:first-of-type { border-top: 0; }
+.faq-card summary { cursor: pointer; font-weight: 600; font-size: 14px; list-style: none; display: flex; align-items: center; gap: 8px; }
+.faq-card summary::-webkit-details-marker { display: none; }
+.faq-card summary::before { content: '+'; color: var(--accent); font-weight: 700; width: 14px; }
+.faq-card details[open] summary::before { content: '\2212'; }
+.faq-card details p { margin: 8px 0 0 22px; max-width: 80ch; }

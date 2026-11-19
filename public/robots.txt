@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Hash routes (#/split, #/risk, ...) are rendered client-side from the same document.
+Sitemap: https://ip.songxwn.com/sitemap.xml

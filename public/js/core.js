@@ -9,12 +9,26 @@
   const I18N = {
     zh: {
       brand: 'IP妙妙工具箱', brandSub: '本机 IP · 网络诊断 · 子网计算',
+      seoTitleHome: 'IP妙妙工具箱 · 本机 IP 查询 · 分流检测 · DNS 出口 · IP 计算器',
+      homeMetaDesc: 'IP妙妙工具箱提供本机 IPv4/IPv6 地址与归属查询、国内外出口与分流检测、CDN 命中节点、DNS 泄露、WebRTC、住宅 IP 可信度、网络测速与 IPv4/IPv6 子网计算器。纯静态、零后端，计算在本地完成。',
       nav_home: '本机 IP', nav_split: '分流检测', nav_cdn: 'CDN 节点', nav_dns: 'DNS 出口',
       nav_webrtc: 'WebRTC', nav_query: 'IP 查询', nav_calc: 'IP 计算器',
       switchLang: '切换语言', switchTheme: '切换主题',
       themeAuto: '自动', themeLight: '浅色', themeDark: '深色',
       copied: '已复制', linkCopied: '分享链接已复制', na: '不适用',
       footer: '纯静态站点 · 子网计算完全在本地完成；网络检测由你的浏览器直接请求第三方公开接口',
+      aboutTitle: '关于 IP妙妙工具箱',
+      aboutP1: '这是一个纯静态、零后端的网络工具箱：所有检测都由浏览器直接请求第三方公开接口完成，子网计算在本地运行，不经过本站服务器，也不记录你的 IP。',
+      aboutP2: '支持本机 IPv4 / IPv6 查询、国内外出口与分流检测、CDN 节点、DNS 出口、WebRTC 检测、IP 归属与 ASN 查询、住宅 IP 可信度、网络测速和 IPv4 / IPv6 子网计算器，可切换中英文与深浅色主题。',
+      faqTitle: '常见问题',
+      faqQ1: '这个网站会记录或上传我的 IP 吗？',
+      faqA1: '不会。本站是纯静态页面，没有后端服务器：IP 查询、分流检测、DNS 出口和测速都由你的浏览器直接请求第三方公开接口，子网计算完全在本地完成，本站不经过、也不记录你的 IP。',
+      faqQ2: '为什么不同接口显示的 IP 不一样？',
+      faqA2: '同一个网络可能有多个出口（多线、分流代理或 CDN 就近接入）。「本机 IP」页面会对比国内与国际接口看到的地址；如果两者不同，说明你的流量走了不同的出口，可继续用「分流检测」查看各网站的实际出口。',
+      faqQ3: '如何检查代理是否生效、有没有 DNS 或 WebRTC 泄露？',
+      faqA3: '先看「本机 IP」确认出口地址与归属地，再用「DNS 出口」检查递归 DNS 解析位置，用「WebRTC」对比 UDP 出口与网页出口。三者位置不一致时，通常意味着存在 DNS 泄露或 WebRTC 绕过代理。',
+      faqQ4: 'IP 计算器支持 IPv6 吗？可以离线使用吗？',
+      faqA4: '支持。IP 计算器同时支持 IPv4 与 IPv6 的 CIDR / 掩码换算、地址范围与可用主机数计算，且全部在浏览器本地完成，断网也能正常使用。',
       tPublic: '公网地址', tPrivate: '私有地址', tLoopback: '环回地址', tLinkLocal: '链路本地', tMulticast: '组播',
       tReserved: '保留地址', tCGNAT: '运营商级 NAT', tDoc: '文档示例', tBench: '基准测试', tThis: '本网络',
       tBroadcast: '受限广播', tUnspec: '未指定地址', tMapped: 'IPv4 映射', tNAT64: 'NAT64', tTeredo: 'Teredo',
@@ -22,12 +36,26 @@
     },
     en: {
       brand: 'IP Miaomiao Toolbox', brandSub: 'My IP · Network diagnostics · Subnetting',
+      seoTitleHome: 'IP Miaomiao Toolbox · My IP · Split Tunnel · DNS Egress · IP Calculator',
+      homeMetaDesc: 'IP Miaomiao Toolbox: my IPv4/IPv6 address and location, multi-source egress and split-tunnel checks, CDN edge nodes, DNS leak, WebRTC, residential IP trust, speed tests and an IPv4/IPv6 subnet calculator. Fully static with no backend; math runs locally.',
       nav_home: 'My IP', nav_split: 'Split Tunnel', nav_cdn: 'CDN Nodes', nav_dns: 'DNS Egress',
       nav_webrtc: 'WebRTC', nav_query: 'IP Lookup', nav_calc: 'IP Calculator',
       switchLang: 'Switch language', switchTheme: 'Switch theme',
       themeAuto: 'Auto', themeLight: 'Light', themeDark: 'Dark',
       copied: 'Copied', linkCopied: 'Share link copied', na: 'N/A',
       footer: '100% static · subnet math runs locally; network checks are requested by your browser directly from public third-party APIs',
+      aboutTitle: 'About IP Miaomiao Toolbox',
+      aboutP1: 'A fully static toolbox with no backend: every check runs in your browser against public third-party APIs, and all subnet math is local. Nothing is proxied through our server, and your IP is not logged.',
+      aboutP2: 'Includes my IPv4 / IPv6 lookup, split-tunnel and multi-source egress checks, CDN edge nodes, DNS egress, WebRTC, IP and ASN lookup, residential IP trust checks, network speed tests and an IPv4 / IPv6 subnet calculator, with Chinese/English and light/dark themes.',
+      faqTitle: 'Frequently asked questions',
+      faqQ1: 'Does this site log or upload my IP?',
+      faqA1: 'No. The site is fully static with no backend: IP lookups, split-tunnel checks, DNS egress and speed tests are requested by your browser directly from public third-party APIs, and all subnet math runs locally. Your IP never passes through, and is never logged by, this site.',
+      faqQ2: 'Why do different services show different IPs?',
+      faqA2: 'A network can have several egresses (multi-homing, split-tunnel proxies or nearby CDN PoPs). The My IP page compares what domestic and international services see; if they differ, your traffic is split, and the Split Tunnel page shows the actual egress per website.',
+      faqQ3: 'How do I check whether a proxy works and whether DNS or WebRTC leaks?',
+      faqA3: 'Start with My IP to confirm the egress address and location, then use DNS Egress to see where recursive DNS resolves and WebRTC to compare the UDP egress with the web egress. Mismatched locations usually mean a DNS leak or WebRTC bypassing the proxy.',
+      faqQ4: 'Does the calculator support IPv6, and does it work offline?',
+      faqA4: 'Yes. The calculator handles IPv4 and IPv6 CIDR / mask conversion, address ranges and usable host counts, and runs entirely in your browser, so it keeps working offline.',
       tPublic: 'Public', tPrivate: 'Private', tLoopback: 'Loopback', tLinkLocal: 'Link-local', tMulticast: 'Multicast',
       tReserved: 'Reserved', tCGNAT: 'Carrier-grade NAT', tDoc: 'Documentation', tBench: 'Benchmarking', tThis: 'This network',
       tBroadcast: 'Limited broadcast', tUnspec: 'Unspecified', tMapped: 'IPv4-mapped', tNAT64: 'NAT64', tTeredo: 'Teredo',
@@ -196,8 +224,7 @@
     document.documentElement.dataset.theme = dark ? 'dark' : 'light';
     document.documentElement.dataset.mode = themeMode;
     IPC.$('#themeLabel').textContent = t(themeMode === 'auto' ? 'themeAuto' : themeMode === 'light' ? 'themeLight' : 'themeDark');
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.content = dark ? '#0b0d14' : '#f5f6fb';
+    document.querySelectorAll('meta[name="theme-color"]').forEach((m) => { m.content = dark ? '#0b0d14' : '#f5f6fb'; });
     try { localStorage.setItem('ipc-theme', themeMode); } catch (e) { }
   }
   (mq.addEventListener ? mq.addEventListener.bind(mq, 'change') : mq.addListener.bind(mq))(() => { if (themeMode === 'auto') applyTheme(); });
@@ -225,7 +252,24 @@
   };
 
   function setTitle() {
-    document.title = (current && current !== 'home' ? t('nav_' + current) + ' · ' : '') + t('brand') + (current === 'home' ? ' · ' + t('nav_home') : '');
+    document.title = current === 'home' ? t('seoTitleHome') : t('nav_' + current) + ' · ' + t('brand');
+    setMeta();
+  }
+
+  const PAGE_DESC = { home: 'homeDesc', split: 'splitDesc', cdn: 'cdnDesc', dns: 'dnsDesc', webrtc: 'rtcDesc', query: 'queryDesc', risk: 'riskDesc', speed: 'speedDesc', calc: 'calcDesc' };
+  const META_DESC = '纯静态 IP 工具箱：本机 IPv4/IPv6 查询、国内外出口与分流检测、CDN 节点、DNS 泄露、WebRTC、住宅 IP 可信度、网络测速与 IPv4/IPv6 子网计算器。A static IP toolbox for my IP, split tunnel, DNS leak, residential IP, speed test and subnet calculation.';
+  function setMeta() {
+    const key = PAGE_DESC[current];
+    let desc = current === 'home' ? t('homeMetaDesc') : key ? t(key) : '';
+    if (!desc || desc === key) desc = META_DESC;
+    const title = document.title;
+    const put = (sel, val) => { const e = document.querySelector(sel); if (e) e.setAttribute('content', val); };
+    put('meta[name="description"]', desc);
+    put('meta[property="og:title"]', title);
+    put('meta[property="og:description"]', desc);
+    put('meta[name="twitter:title"]', title);
+    put('meta[name="twitter:description"]', desc);
+    put('meta[property="og:locale"]', IPC.lang === 'zh' ? 'zh_CN' : 'en_US');
   }
 
   function route() {

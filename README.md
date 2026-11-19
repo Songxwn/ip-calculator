@@ -34,7 +34,17 @@ public/
   js/net.js       fetch / JSONP 封装、各数据源字段归一化、IATA 节点名
   js/home.js split.js cdn.js dns.js webrtc.js query.js risk.js speed.js calc.js   各页面
   _headers        安全头与 CSP
+  robots.txt      爬虫规则
+  sitemap.xml     站点地图
+  og.jpg          社交分享预览图（1200×630）
+  apple-touch-icon.png  iOS 主屏图标（180×180）
 ```
+
+## SEO
+- `index.html` 内置 canonical、description、keywords、Open Graph、Twitter Card 与 `WebSite` / `WebApplication` / `Organization` / `FAQPage` JSON-LD。
+- 路由切换时会同步更新 `<title>`、`description`、`og:title` / `og:description` 与 `og:locale`（见 `js/core.js` 的 `setTitle` / `setMeta`）。
+- 首页提供爬虫可见的「关于」与「常见问题」文本，并保留 `<noscript>` 兜底说明。
+- `robots.txt` 与 `sitemap.xml` 位于站点根目录；如果更换域名，请同步修改 canonical、`og:url` / `og:image`、JSON-LD、`sitemap.xml` 和 `robots.txt` 中的 `https://ip.songxwn.com/`。
 
 ## 部署到 Cloudflare Pages
 
