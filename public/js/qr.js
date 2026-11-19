@@ -3,8 +3,8 @@
   const IPC = window.IPC;
 
   IPC.addI18n({
-    zh: { qrTitle: '手机扫码访问', qrDesc: '用手机相机或微信扫一扫，在移动设备上打开当前页面' },
-    en: { qrTitle: 'Scan to open on mobile', qrDesc: 'Scan with your phone camera to open this page on a mobile device' }
+    zh: { qrTitle: '扫码访问', qrDesc: '手机扫码打开当前页面' },
+    en: { qrTitle: 'QR code', qrDesc: 'Scan to open this page on your phone' }
   });
 
   // Minimal QR encoder: byte mode, ECC level M, versions 1-20
@@ -176,15 +176,21 @@
   const url = () => location.origin + location.pathname + location.hash;
   let last = '';
   function update() {
-    const box = document.getElementById('qrBox'), cap = document.getElementById('qrUrl');
+    const box = document.getElementById('qrBox');
     if (!box) return;
     const u = url();
     if (u === last) return;
     last = u;
     box.innerHTML = svg(u);
-    if (cap) cap.textContent = u.replace(/^https?:\/\//, '');
+    box.title = u;
   }
-  document.addEventListener('DOMContentLoaded', update);
+  document.addEventListener('DOMContentLoaded', () => {
+    update();
+    const btn = document.getElementById('qrBtn'), wrap = btn && btn.parentNode;
+    if (!btn) return;
+    btn.addEventListener('click', (e) => { e.stopPropagation(); const o = wrap.classList.toggle('open'); btn.setAttribute('aria-expanded', o); });
+    document.addEventListener('click', (e) => { if (!wrap.contains(e.target)) { wrap.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); } });
+  });
   window.addEventListener('hashchange', update);
   const setHash = IPC.setHash;
   IPC.setHash = function () { const r = setHash.apply(this, arguments); update(); return r; };
