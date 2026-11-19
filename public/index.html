@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>IP 子网计算器 · IPv4 / IPv6 Subnet Calculator</title>
-<meta name="description" content="快速、美观的 IPv4 / IPv6 子网计算器：CIDR、掩码、网络地址、广播地址、可用主机、子网划分、范围转 CIDR。A fast, beautiful IPv4 / IPv6 subnet calculator.">
-<meta name="theme-color" content="#4f46e5">
+<title>IP 工具箱 · 本机 IP 查询 · 分流检测 · DNS 出口 · IP 计算器</title>
+<meta name="description" content="纯静态 IP 工具箱：本机 IPv4/IPv6 查询、网站分流检测、CDN 命中节点、DNS 出口与泄露检测、WebRTC UDP 检测、多源 IP 归属查询、IPv4/IPv6 子网计算器。A static IP toolbox: my IP, split tunnel test, CDN nodes, DNS leak, WebRTC, IP lookup and subnet calculator.">
+<meta name="theme-color" content="#f5f6fb">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="style.css">
 <script>
@@ -14,6 +14,7 @@
       var m = localStorage.getItem('ipc-theme') || 'auto';
       var d = m === 'dark' || (m === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
       document.documentElement.dataset.theme = d ? 'dark' : 'light';
+      document.documentElement.dataset.mode = m;
     } catch (e) {}
   })();
 </script>
@@ -23,11 +24,11 @@
 
 <header class="topbar">
   <div class="wrap topbar-inner">
-    <a class="brand" href="./">
+    <a class="brand" href="#/">
       <img src="favicon.svg" alt="" width="32" height="32">
       <span>
-        <strong data-i18n="title">IP 子网计算器</strong>
-        <small data-i18n="subtitle">IPv4 · IPv6 · CIDR</small>
+        <strong data-i18n="brand">IP 工具箱</strong>
+        <small data-i18n="brandSub">本机 IP · 网络诊断 · 子网计算</small>
       </span>
     </a>
     <div class="actions">
@@ -43,77 +44,208 @@
       </button>
     </div>
   </div>
+  <nav class="wrap navbar" aria-label="Tools">
+    <a class="nav-link" href="#/" data-route="home" data-i18n="nav_home">本机 IP</a>
+    <a class="nav-link" href="#/split" data-route="split" data-i18n="nav_split">分流检测</a>
+    <a class="nav-link" href="#/cdn" data-route="cdn" data-i18n="nav_cdn">CDN 节点</a>
+    <a class="nav-link" href="#/dns" data-route="dns" data-i18n="nav_dns">DNS 出口</a>
+    <a class="nav-link" href="#/webrtc" data-route="webrtc" data-i18n="nav_webrtc">WebRTC</a>
+    <a class="nav-link" href="#/query" data-route="query" data-i18n="nav_query">IP 查询</a>
+    <a class="nav-link calc-link" href="#/calc" data-route="calc" data-i18n="nav_calc">IP 计算器</a>
+  </nav>
 </header>
 
 <main class="wrap">
-  <section class="hero card">
-    <label class="input-label" for="ipInput" data-i18n="inputLabel">输入 IP 地址 / CIDR</label>
-    <div class="input-wrap" id="inputWrap">
-      <span class="ver-badge" id="verBadge">IP</span>
-      <input id="ipInput" type="text" spellcheck="false" autocomplete="off" autocapitalize="off"
-             data-i18n-ph="inputPh" placeholder="192.168.1.10/24 · 10.0.0.1 255.255.0.0 · 2001:db8::1/64">
-      <button class="ghost-btn" id="clearBtn" type="button" data-i18n-title="clear">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
-      </button>
-      <button class="ghost-btn" id="shareBtn" type="button" data-i18n-title="share">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-      </button>
-    </div>
-    <div class="input-msg" id="inputMsg"></div>
 
-    <div class="prefix-row">
-      <div class="prefix-ctl">
-        <button class="step-btn" id="pfxDown" type="button" aria-label="-1">−</button>
-        <div class="prefix-val"><span>/</span><input id="pfxNum" type="number" min="0" max="32" value="24" aria-label="prefix"></div>
-        <button class="step-btn" id="pfxUp" type="button" aria-label="+1">+</button>
+  <!-- ============ Home ============ -->
+  <section class="page" id="page-home">
+    <div class="page-head">
+      <div><h1 data-i18n="homeTitle">本机 IP 查询</h1><p class="muted" data-i18n="homeDesc"></p></div>
+      <button class="btn secondary" id="homeRefresh" type="button" data-i18n="refresh">重新检测</button>
+    </div>
+    <div class="grid2 ip-cards">
+      <div class="card ip-card" id="homeV4"></div>
+      <div class="card ip-card" id="homeV6"></div>
+    </div>
+
+    <div class="card block">
+      <div class="block-head">
+        <div><h3 data-i18n="multiSrc">多源出口 IP</h3><p class="muted" data-i18n="multiSrcDesc"></p></div>
+        <div class="toggles">
+          <label class="switch"><input type="checkbox" data-opt="ip"><span></span><em data-i18n="hideIp">隐藏 IP</em></label>
+          <label class="switch"><input type="checkbox" data-opt="cn"><span></span><em data-i18n="hideCn">隐藏国内</em></label>
+          <label class="switch"><input type="checkbox" data-opt="intl"><span></span><em data-i18n="hideIntl">隐藏国际</em></label>
+        </div>
       </div>
-      <input type="range" id="pfxRange" min="0" max="32" value="24" aria-label="prefix">
-      <div class="prefix-mask mono" id="pfxMask">255.255.255.0</div>
+      <div class="src-grid" id="homeSrc"></div>
+      <p class="note"><a href="#/split" data-i18n="moreSplit"></a></p>
     </div>
 
-    <div class="chips-row">
-      <span class="chips-title" data-i18n="examples">示例</span>
-      <div class="chips" id="examples"></div>
-    </div>
-    <div class="chips-row" id="historyRow" hidden>
-      <span class="chips-title" data-i18n="history">最近</span>
-      <div class="chips" id="history"></div>
-      <button class="link-btn" id="clearHistory" type="button" data-i18n="clearHistory">清除</button>
+    <div class="card block">
+      <h3 data-i18n="connTitle">网站连通性</h3>
+      <p class="muted" data-i18n="connDesc"></p>
+      <div class="ping-grid" id="homePing"></div>
     </div>
   </section>
 
-  <nav class="tabs" role="tablist">
-    <button class="tab active" data-tab="calc" type="button" data-i18n="tabCalc">计算结果</button>
-    <button class="tab" data-tab="split" type="button" data-i18n="tabSplit">子网划分</button>
-    <button class="tab" data-tab="range" type="button" data-i18n="tabRange">范围 → CIDR</button>
-    <button class="tab" data-tab="cheat" type="button" data-i18n="tabCheat">速查表</button>
-  </nav>
+  <!-- ============ Split ============ -->
+  <section class="page" id="page-split">
+    <div class="page-head">
+      <div><h1 data-i18n="splitTitle">网站分流检测</h1><p class="muted" data-i18n="splitDesc"></p></div>
+      <button class="btn secondary" id="splitRefresh" type="button" data-i18n="refresh">重新检测</button>
+    </div>
+    <div class="verdict" id="splitVerdict"></div>
+    <div id="splitList"></div>
+  </section>
 
-  <section class="panel active" id="panel-calc"></section>
-  <section class="panel" id="panel-split"></section>
-
-  <section class="panel" id="panel-range">
+  <!-- ============ CDN ============ -->
+  <section class="page" id="page-cdn">
+    <div class="page-head">
+      <div><h1 data-i18n="cdnTitle">CDN 命中节点</h1><p class="muted" data-i18n="cdnDesc"></p></div>
+      <button class="btn secondary" id="cdnRefresh" type="button" data-i18n="refresh">重新检测</button>
+    </div>
     <div class="card">
-      <h3 data-i18n="rangeTitle">IP 范围转换为 CIDR</h3>
-      <p class="muted" data-i18n="rangeDesc">输入起始与结束地址，计算覆盖该范围的最少 CIDR 块。</p>
-      <div class="range-form">
-        <input id="rangeStart" class="field mono" type="text" spellcheck="false" autocomplete="off" placeholder="192.168.0.10">
-        <span class="range-arrow">→</span>
-        <input id="rangeEnd" class="field mono" type="text" spellcheck="false" autocomplete="off" placeholder="192.168.3.200">
-      </div>
-      <div id="rangeOut"></div>
+      <div class="section-title" id="cdnSummary"></div>
+      <div class="table-wrap plain"><table>
+        <thead><tr><th data-i18n="colCdn">CDN</th><th data-i18n="colPop">节点</th><th data-i18n="colCity">城市</th><th data-i18n="colLatency">延迟</th><th data-i18n="colVia">依据</th></tr></thead>
+        <tbody id="cdnList"></tbody>
+      </table></div>
     </div>
   </section>
 
-  <section class="panel" id="panel-cheat"></section>
+  <!-- ============ DNS ============ -->
+  <section class="page" id="page-dns">
+    <div class="page-head">
+      <div><h1 data-i18n="dnsTitle">DNS 出口查询</h1><p class="muted" data-i18n="dnsDesc"></p></div>
+      <button class="btn secondary" id="dnsRefresh" type="button" data-i18n="refresh">重新检测</button>
+    </div>
+    <div class="verdict warn" id="dnsWarn" hidden><b data-i18n="dnsLeakWarn"></b></div>
+    <div class="card">
+      <div class="block-head"><div class="section-title" data-i18n="dnsServers">DNS 出口</div><div class="src-pills" id="dnsSrc"></div></div>
+      <div class="table-wrap plain"><table>
+        <thead><tr><th data-i18n="dnsServerIp">IP</th><th data-i18n="location">归属地</th><th data-i18n="dnsHits">次数</th><th data-i18n="dnsSrc">来源</th></tr></thead>
+        <tbody id="dnsList"></tbody>
+      </table></div>
+    </div>
+    <div class="card" id="dnsNs" style="margin-top:14px" hidden></div>
+  </section>
+
+  <!-- ============ WebRTC ============ -->
+  <section class="page" id="page-webrtc">
+    <div class="page-head">
+      <div><h1 data-i18n="rtcTitle">WebRTC UDP 检测</h1><p class="muted" data-i18n="rtcDesc"></p></div>
+      <button class="btn secondary" id="rtcRefresh" type="button" data-i18n="refresh">重新检测</button>
+    </div>
+    <div class="verdict" id="rtcVerdict" hidden></div>
+    <div class="card">
+      <div class="table-wrap plain"><table>
+        <thead><tr><th data-i18n="colStun">STUN</th><th data-i18n="colUdp">UDP 出口</th><th data-i18n="colNat">端口</th><th data-i18n="colLatency">延迟</th></tr></thead>
+        <tbody id="rtcList"></tbody>
+      </table></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <div class="section-title" data-i18n="rtcLocal">本地候选地址</div>
+      <div class="chips" id="rtcLocal"></div>
+      <p class="note" data-i18n="rtcLocalNote"></p>
+    </div>
+  </section>
+
+  <!-- ============ Query ============ -->
+  <section class="page" id="page-query">
+    <div class="page-head">
+      <div><h1 data-i18n="queryTitle">IP 洞察</h1><p class="muted" data-i18n="queryDesc"></p></div>
+    </div>
+    <form class="card q-form" id="qForm" autocomplete="off">
+      <div class="input-wrap">
+        <input id="qInput" class="big-input" type="text" spellcheck="false" autocapitalize="off" data-i18n-ph="queryPh">
+        <button class="ghost-btn wide" id="qMine" type="button" data-i18n="queryMine">查询本机</button>
+        <button class="btn" type="submit" data-i18n="queryBtn">查询</button>
+      </div>
+      <div class="input-msg" id="qMsg"></div>
+    </form>
+    <div id="qOut"></div>
+  </section>
+
+  <!-- ============ Calculator ============ -->
+  <section class="page" id="page-calc">
+    <div class="page-head">
+      <div><h1 data-i18n="calcTitle">IP 子网计算器</h1><p class="muted" data-i18n="calcDesc"></p></div>
+    </div>
+    <section class="hero card">
+      <label class="input-label" for="ipInput" data-i18n="inputLabel">输入 IP 地址 / CIDR</label>
+      <div class="input-wrap" id="inputWrap">
+        <span class="ver-badge" id="verBadge">IP</span>
+        <input id="ipInput" class="big-input" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" data-i18n-ph="inputPh">
+        <button class="ghost-btn" id="clearBtn" type="button" data-i18n-title="clear">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+        <button class="ghost-btn" id="shareBtn" type="button" data-i18n-title="share">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        </button>
+      </div>
+      <div class="input-msg" id="inputMsg"></div>
+
+      <div class="prefix-row">
+        <div class="prefix-ctl">
+          <button class="step-btn" id="pfxDown" type="button" aria-label="-1">−</button>
+          <div class="prefix-val"><span>/</span><input id="pfxNum" type="number" min="0" max="32" value="24" aria-label="prefix"></div>
+          <button class="step-btn" id="pfxUp" type="button" aria-label="+1">+</button>
+        </div>
+        <input type="range" id="pfxRange" min="0" max="32" value="24" aria-label="prefix">
+        <div class="prefix-mask mono" id="pfxMask">255.255.255.0</div>
+      </div>
+
+      <div class="chips-row">
+        <span class="chips-title" data-i18n="examples">示例</span>
+        <div class="chips" id="examples"></div>
+      </div>
+      <div class="chips-row" id="historyRow" hidden>
+        <span class="chips-title" data-i18n="history">最近</span>
+        <div class="chips" id="history"></div>
+        <button class="link-btn" id="clearHistory" type="button" data-i18n="clearHistory">清除</button>
+      </div>
+    </section>
+
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-tab="calc" type="button" data-i18n="tabCalc">计算结果</button>
+      <button class="tab" data-tab="split" type="button" data-i18n="tabSplit">子网划分</button>
+      <button class="tab" data-tab="range" type="button" data-i18n="tabRange">范围 → CIDR</button>
+      <button class="tab" data-tab="cheat" type="button" data-i18n="tabCheat">速查表</button>
+    </nav>
+
+    <section class="panel active" id="panel-calc"></section>
+    <section class="panel" id="panel-split"></section>
+    <section class="panel" id="panel-range">
+      <div class="card">
+        <h3 data-i18n="rangeTitle">IP 范围转换为 CIDR</h3>
+        <p class="muted" data-i18n="rangeDesc"></p>
+        <div class="range-form">
+          <input id="rangeStart" class="field mono" type="text" spellcheck="false" autocomplete="off" placeholder="192.168.0.10">
+          <span class="range-arrow">→</span>
+          <input id="rangeEnd" class="field mono" type="text" spellcheck="false" autocomplete="off" placeholder="192.168.3.200">
+        </div>
+        <div id="rangeOut"></div>
+      </div>
+    </section>
+    <section class="panel" id="panel-cheat"></section>
+    <p class="note kbd-hint"><kbd>/</kbd> <span data-i18n="kbdFocus">聚焦输入</span> · <kbd>↑</kbd><kbd>↓</kbd> <span data-i18n="kbdPrefix">调整前缀</span></p>
+  </section>
 </main>
 
 <footer class="wrap footer">
-  <span data-i18n="footer">纯静态 · 所有计算均在浏览器本地完成，不上传任何数据</span>
-  <span class="kbd-hint"><kbd>/</kbd> <span data-i18n="kbdFocus">聚焦输入</span> · <kbd>↑</kbd><kbd>↓</kbd> <span data-i18n="kbdPrefix">调整前缀</span></span>
+  <span data-i18n="footer"></span>
+  <a href="https://github.com/Songxwn/ip-calculator" target="_blank" rel="noopener">GitHub</a>
 </footer>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="app.js" defer></script>
+<script src="js/core.js" defer></script>
+<script src="js/net.js" defer></script>
+<script src="js/home.js" defer></script>
+<script src="js/split.js" defer></script>
+<script src="js/cdn.js" defer></script>
+<script src="js/dns.js" defer></script>
+<script src="js/webrtc.js" defer></script>
+<script src="js/query.js" defer></script>
+<script src="js/calc.js" defer></script>
 </body>
 </html>
