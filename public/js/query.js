@@ -26,7 +26,7 @@
   const enc = encodeURIComponent;
   const SOURCES = [
     { name: 'IP.SB', run: (ip) => req('https://api.ip.sb/geoip/' + enc(ip)).then((r) => N.ipsb(r.data)) },
-    { name: 'IPinfo.io', run: (ip) => req('https://ipinfo.io/' + enc(ip) + '/json').then((r) => N.ipinfo(r.data)) },
+    { name: 'IPinfo.io', run: (ip) => net.ipinfoFull(ip) },
     {
       name: 'ipapi.is', run: (ip) => req('https://api.ipapi.is/?q=' + enc(ip)).then((r) => {
         const d = r.data, g = N.ipapis(d);
@@ -103,7 +103,7 @@
       else if (r.error) loc = `<span class="err">${esc(r.error)}</span>`;
       else {
         loc = `${ccBadge(r.cc)}${esc(locText(r)) || '—'}`;
-        isp = `${r.asn ? `<span class="mono asn">AS${esc(r.asn)}</span> ` : ''}${esc(r.isp || r.org || '')}`;
+        isp = `${r.asn ? `<span class="mono asn">AS${esc(r.asn)}</span> ` : ''}${esc(r.isp || r.org || '')}${r.asType ? ' ' + net.asTypeBadge(r.asType) : ''}`;
         const ex = [];
         if (r.hostname) ex.push(`<small class="muted mono">${esc(r.hostname)}</small>`);
         if (r.cidr) ex.push(`<small class="muted mono">${esc(r.cidr)}</small>`);

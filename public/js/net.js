@@ -82,7 +82,17 @@
   const N = {
     ipsb: (d) => ({ ip: d.ip, cc: d.country_code, country: d.country, region: d.region, city: d.city, isp: d.isp, org: d.organization || d.asn_organization, asn: d.asn }),
     ipwho: (d) => d.success === false ? null : ({ ip: d.ip, cc: d.country_code, country: d.country, region: d.region, city: d.city, isp: d.connection && d.connection.isp, org: d.connection && d.connection.org, asn: d.connection && d.connection.asn }),
-    ipinfo: (d) => ({ ip: d.ip, cc: d.country, region: d.region, city: d.city, isp: stripAsn(d.org), asn: parseAsn(d.org), hostname: d.hostname }),
+    ipinfo: (d) => {
+      if (d && d.data && d.input) d = d.data;
+      const g = { ip: d.ip, cc: d.country, region: d.region, city: d.city, isp: stripAsn(d.org), asn: parseAsn(d.org), hostname: d.hostname };
+      if (d.asn && typeof d.asn === 'object') {
+        g.asn = parseAsn(d.asn.asn) || g.asn;
+        g.isp = d.asn.name || g.isp;
+        g.asType = d.asn.type || '';
+        g.cidr = d.asn.route || '';
+      }
+      return g;
+    },
     ipapis: (d) => {
       const loc = d.location || {}, asn = d.asn && typeof d.asn === 'object' ? d.asn : null;
       const company = d.company && typeof d.company === 'object' ? d.company.name : d.company;
@@ -143,6 +153,20 @@
     return `<span class="cc" title="${esc(countryName(cc))}">${esc(cc.toUpperCase())}</span>`;
   }
 
+  const AS_TYPES = { isp: 'asIsp', business: 'asBusiness', hosting: 'asHosting', education: 'asEdu', government: 'asGov', inactive: 'asInactive' };
+  const AS_CLS = { isp: 'ok', business: '', hosting: 'warn', education: 'intl', government: 'cn', inactive: '' };
+  function asTypeBadge(type) {
+    if (!type) return '';
+    const k = String(type).toLowerCase();
+    return `<span class="tag ${AS_CLS[k] || ''}" title="AS Type: ${esc(k)}">${esc(AS_TYPES[k] ? t(AS_TYPES[k]) : k)}</span>`;
+  }
+
+  async function ipinfoFull(ip) {
+    if (!ip) ip = (await req('https://ipinfo.io/json')).data.ip;
+    try { return N.ipinfo((await req('https://ipinfo.io/widget/demo/' + encodeURIComponent(ip))).data); }
+    catch (e) { return N.ipinfo((await req('https://ipinfo.io/' + encodeURIComponent(ip) + '/json')).data); }
+  }
+
   const IATA = {
     HKG: ['香港', 'Hong Kong'], TPE: ['台北', 'Taipei'], KHH: ['高雄', 'Kaohsiung'], MFM: ['澳门', 'Macau'],
     NRT: ['东京', 'Tokyo'], HND: ['东京', 'Tokyo'], KIX: ['大阪', 'Osaka'], FUK: ['福冈', 'Fukuoka'], OKA: ['冲绳', 'Okinawa'],
@@ -193,9 +217,15 @@
   };
 
   IPC.addI18n({
-    zh: { errTimeout: '超时', errNetwork: '无法连接', loading: '检测中…', refresh: '重新检测', notDetected: '未检测到' },
-    en: { errTimeout: 'Timed out', errNetwork: 'Unreachable', loading: 'Checking…', refresh: 'Re-run', notDetected: 'Not detected' }
+    zh: {
+      errTimeout: '超时', errNetwork: '无法连接', loading: '检测中…', refresh: '重新检测', notDetected: '未检测到',
+      asType: 'AS 类型', asIsp: '家宽 ISP', asBusiness: '商业', asHosting: '机房 / 托管', asEdu: '教育', asGov: '政府', asInactive: '未启用'
+    },
+    en: {
+      errTimeout: 'Timed out', errNetwork: 'Unreachable', loading: 'Checking…', refresh: 'Re-run', notDetected: 'Not detected',
+      asType: 'AS type', asIsp: 'ISP', asBusiness: 'Business', asHosting: 'Hosting', asEdu: 'Education', asGov: 'Government', asInactive: 'Inactive'
+    }
   });
 
-  IPC.net = { rand, req, jsonp, script, trace, ping, N, geo, locText, ispText, countryName, ccBadge, iataName, latClass, errText, parseAsn };
+  IPC.net = { rand, req, jsonp, script, trace, ping, asTypeBadge, ipinfoFull, N, geo, locText, ispText, countryName, ccBadge, iataName, latClass, errText, parseAsn };
 })();

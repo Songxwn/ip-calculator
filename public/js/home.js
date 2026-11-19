@@ -28,7 +28,7 @@
     { id: 'pconline', name: '太平洋 PConline', region: 'cn', run: () => jsonp('https://whois.pconline.com.cn/ipJson.jsp', { charset: 'gbk' }).then((r) => N.pconline(r.data)) },
     { id: 'speedtestcn', name: '测速网 Speedtest.cn', region: 'cn', run: () => req('https://api-v3.speedtest.cn/ip').then((r) => N.speedtestcn(r.data)) },
     { id: 'cf', name: 'Cloudflare', region: 'intl', run: () => req('https://speed.cloudflare.com/meta').then((r) => N.cfmeta(r.data)) },
-    { id: 'ipinfo', name: 'IPinfo.io', region: 'intl', run: () => req('https://ipinfo.io/json').then((r) => N.ipinfo(r.data)) },
+    { id: 'ipinfo', name: 'IPinfo.io', region: 'intl', run: () => net.ipinfoFull() },
     { id: 'ipapis', name: 'ipapi.is', region: 'intl', run: () => req('https://api.ipapi.is/').then((r) => N.ipapis(r.data)) }
   ];
 
@@ -53,6 +53,11 @@
   const regionTag = (r) => `<span class="tag ${r === 'cn' ? 'cn' : 'intl'}">${t(r === 'cn' ? 'domestic' : 'intl')}</span>`;
   const ipLink = (ip) => ip ? `<a class="ipv mono" href="#/query?ip=${encodeURIComponent(ip)}" title="${esc(ip)}">${esc(ip)}</a>` : '';
 
+  const asTypeOf = (ip) => {
+    const s = results.src.ipinfo;
+    return s && s.ip === ip && s.asType ? net.asTypeBadge(s.asType) : '';
+  };
+
   function renderMain(ver) {
     const r = results[ver], box = el[ver];
     const label = ver === 'v4' ? 'IPv4' : 'IPv6';
@@ -66,7 +71,7 @@
           <a class="copy show" href="#/calc?q=${encodeURIComponent(r.ip)}" title="${t('toCalc')}"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h2M12 10h2M16 10v8M8 14h2M12 14h2M8 18h6"/></svg></a></div>
         <div class="kv"><span>${t('location')}</span><b>${ccBadge(g.cc)}${esc(locText(g)) || '—'}</b></div>
         <div class="kv"><span>${t('isp')}</span><b>${esc(g.isp || g.org || '—')}</b></div>
-        <div class="kv"><span>${t('asn')}</span><b class="mono">${g.asn ? 'AS' + esc(g.asn) : '—'}</b></div>`;
+        <div class="kv"><span>${t('asn')}</span><b><span class="mono">${g.asn ? 'AS' + esc(g.asn) : '—'}</span> ${asTypeOf(r.ip)}</b></div>`;
     }
     box.innerHTML = `<div class="ip-head"><span class="ver-badge ${ver === 'v6' ? 'v6' : ''}">${label}</span></div>${body}`;
   }
@@ -77,7 +82,7 @@
       let body;
       if (!r) body = `<div class="src-ip"><span class="skel" style="width:8rem"></span></div><div class="src-loc"><span class="skel" style="width:11rem"></span></div>`;
       else if (r.error) body = `<div class="src-ip err">${esc(r.error)}</div>`;
-      else body = `<div class="src-ip">${ipLink(r.ip)}</div><div class="src-loc">${ccBadge(r.cc)}${esc([locText(r), r.locText ? '' : ispText(r)].filter(Boolean).join(' · ')) || '—'}</div>`;
+      else body = `<div class="src-ip">${ipLink(r.ip)}</div><div class="src-loc">${ccBadge(r.cc)}${esc([locText(r), r.locText ? '' : ispText(r)].filter(Boolean).join(' · ')) || '—'}${r.asType ? ' ' + net.asTypeBadge(r.asType) : ''}</div>`;
       return `<div class="src-card" data-region="${s.region}"><div class="src-head"><b>${esc(s.name)}</b>${regionTag(s.region)}</div>${body}</div>`;
     }).join('');
   }
@@ -121,6 +126,7 @@
         if (id !== runId) return;
         results.src[s.id] = r && r.ip ? r : { error: t('notDetected') };
         renderSources();
+        if (s.id === 'ipinfo') { if (results.v4) renderMain('v4'); if (results.v6) renderMain('v6'); }
       }, (e) => {
         if (id !== runId) return;
         results.src[s.id] = { error: errText(e) };
