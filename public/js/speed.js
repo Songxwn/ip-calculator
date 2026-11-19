@@ -12,9 +12,9 @@
       spPing: '延迟', spJitter: '抖动', spDown: '下载', spUp: '上传', spThreads: '线程', spDur: '时长',
       spIdle: '选择一个节点后点击「开始测速」', spPhasePing: '正在测延迟…', spPhaseDown: '正在测下载…', spPhaseUp: '正在测上传…', spDone: '测速完成',
       spNoUp: '该节点不支持上传测试', spExact: '精确', spEst: '估算', spExactTip: '节点允许跨域读取，逐字节实时统计',
-      spEstTip: '镜像站不允许跨域读取，按固定大小文件的完整下载耗时估算，无实时曲线',
+      spEstTip: '镜像站不允许跨域读取，下载按固定大小文件的完整耗时估算，上传按固定大小数据块的发送耗时估算',
       spBadResp: '节点拒绝了请求（可能被防盗链或限流）', spHist: '测速记录', spClear: '清除',
-      colNode: '节点', colTime: '时间', spNote: '国内高校节点为各校开源镜像站，部分学校会对校外流量限速；国外节点来自 LibreSpeed 公共服务器列表与 Cloudflare。结果受代理、浏览器与设备性能影响，仅供参考。'
+      colNode: '节点', colTime: '时间', spNote: '国内高校节点为各校开源镜像站，部分学校会对校外流量限速；国外节点来自 LibreSpeed 公共服务器列表与 Cloudflare。上传测试仅对提供上传接口的节点开放，结果受代理、浏览器与设备性能影响，仅供参考。'
     },
     en: {
       nav_speed: 'Speed Test', speedTitle: 'Speed Test',
@@ -23,9 +23,9 @@
       spPing: 'Latency', spJitter: 'Jitter', spDown: 'Download', spUp: 'Upload', spThreads: 'Threads', spDur: 'Duration',
       spIdle: 'Choose a server, then press Start', spPhasePing: 'Measuring latency…', spPhaseDown: 'Testing download…', spPhaseUp: 'Testing upload…', spDone: 'Done',
       spNoUp: 'This server does not support upload tests', spExact: 'Exact', spEst: 'Estimate', spExactTip: 'Server allows cross-origin reads, so bytes are counted live',
-      spEstTip: 'Mirror does not allow cross-origin reads; speed is estimated from the time to fully download fixed-size files, with no live curve',
+      spEstTip: 'Mirror does not allow cross-origin reads; download is estimated from the time to fully fetch fixed-size files, upload from the time to send fixed-size chunks',
       spBadResp: 'The server rejected the request (hotlink protection or rate limit)', spHist: 'History', spClear: 'Clear',
-      colNode: 'Server', colTime: 'Time', spNote: 'China nodes are university open-source mirrors, and some throttle off-campus traffic. Servers abroad come from the LibreSpeed public list and Cloudflare. Results depend on proxies, browser and device, so treat them as a guide.'
+      colNode: 'Server', colTime: 'Time', spNote: 'China nodes are university open-source mirrors, and some throttle off-campus traffic. Servers abroad come from the LibreSpeed public list and Cloudflare. Upload tests run only where the node offers an upload endpoint; results depend on proxies, browser and device, so treat them as a guide.'
     }
   });
 
@@ -37,7 +37,16 @@
   const ls = (id, base, name, city, cityEn, cc) => ({ id, group: 'intl', kind: 'ls', base, name: [name, name], loc: [city, cityEn], cc });
   const SERVERS = [
     m('sdu', 'mirrors.sdu.edu.cn', '山东大学', 'Shandong Univ.', '济南', 'Jinan', true),
-    m('ustc', 'mirrors.ustc.edu.cn', '中国科学技术大学', 'USTC', '合肥', 'Hefei'),
+    // Nanjing University runs LibreSpeed under /speed/: it accepts uploads and serves
+    // fixed-size files, but sends no CORS headers, so transfer time is sampled instead.
+    { id: 'nju', group: 'cn', kind: 'mirror', host: 'fs.nju.edu.cn', name: ['南京大学', 'Nanjing Univ.'], loc: ['南京', 'Nanjing'], cc: 'CN',
+      ping: 'https://fs.nju.edu.cn/speed/empty.php',
+      up: 'https://fs.nju.edu.cn/speed/empty.php', upChunk: 16,
+      files: { small: { url: 'https://fs.nju.edu.cn/speed/garbage.php?ckSize=2', size: 2097152 },
+               big: { url: 'https://fs.nju.edu.cn/speed/garbage.php?ckSize=10', size: 10485760 } } },
+    // USTC's mirror has no CORS, but its speed-test backend accepts opaque POSTs,
+    // so upload throughput can be sampled from fixed-size chunks.
+    Object.assign(m('ustc', 'mirrors.ustc.edu.cn', '中国科学技术大学', 'USTC', '合肥', 'Hefei'), { up: 'https://test.ustc.edu.cn/backend/empty.php', upChunk: 16 }),
     m('hust', 'mirrors.hust.edu.cn', '华中科技大学', 'HUST', '武汉', 'Wuhan'),
     m('xjtu', 'mirrors.xjtu.edu.cn', '西安交通大学', "Xi'an Jiaotong Univ.", '西安', "Xi'an"),
     m('hit', 'mirrors.hit.edu.cn', '哈尔滨工业大学', 'Harbin Inst. of Tech.', '哈尔滨', 'Harbin'),
@@ -65,13 +74,14 @@
     ls('beg', 'https://speedtest1.sox.rs/librespeed/backend/', 'SOX', '贝尔格莱德', 'Belgrade', 'RS')
   ];
   const exact = (s) => s.kind !== 'mirror';
-  const canUp = (s) => s.kind === 'cf' || s.kind === 'ls';
+  const canUp = (s) => s.kind === 'cf' || s.kind === 'ls' || !!s.up;
   const L = (a) => a[IPC.lang === 'zh' ? 0 : 1];
 
   const bust = () => '_=' + net.rand(8);
   function pingUrl(s) {
     if (s.kind === 'cf') return 'https://speed.cloudflare.com/__down?bytes=0&' + bust();
     if (s.kind === 'ls') return s.base + 'empty.php?cors=true&' + bust();
+    if (s.ping) return s.ping + '?' + bust();
     return 'https://' + s.host + F_PING + '?' + bust();
   }
   function dlUrl(s) {
@@ -135,7 +145,7 @@
   let cacheP = null;
   const cache = () => cacheP || (cacheP = caches.open('ipc-speed'));
   async function fetchOpaque(s, file, signal) {
-    const url = 'https://' + s.host + file.path + '?' + bust();
+    const url = (file.url || 'https://' + s.host + file.path) + (file.url && file.url.indexOf('?') >= 0 ? '&' : '?') + bust();
     const c = await cache();
     const t0 = performance.now();
     const r = await fetch(url, { mode: 'no-cors', cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer', signal });
@@ -147,10 +157,11 @@
   }
   async function dlOpaque(s, threads, dur, signal, onRate) {
     if (!window.caches) throw new Error('Cache API unavailable');
-    const first = await fetchOpaque(s, F_SMALL, signal);
-    let est = mbps(F_SMALL.size, first);
+    const files = s.files || { small: F_SMALL, big: F_BIG };
+    const first = await fetchOpaque(s, files.small, signal);
+    let est = mbps(files.small.size, first);
     onRate(est, 0.1);
-    const file = est > 40 ? F_BIG : F_SMALL;
+    const file = est > 40 ? files.big : files.small;
     let bytes = 0, last = 0;
     const t0 = performance.now(), end = t0 + dur;
     const worker = async () => {
@@ -163,6 +174,38 @@
     const res = await Promise.allSettled(Array.from({ length: threads }, worker));
     if (!bytes) { const e = res.find((x) => x.status === 'rejected'); throw e ? e.reason : new Error(t('spBadResp')); }
     return mbps(bytes, last - t0);
+  }
+
+  // Upload to an endpoint that does not send CORS headers (opaque response).
+  // fetch has no upload progress, so throughput is sampled per completed fixed-size chunk.
+  async function uploadOpaque(s, threads, dur, signal, onRate) {
+    const CH = (s.upChunk || 8) * 1024 * 1024;
+    const blob = new Blob([new Uint8Array(CH)]);
+    let bytes = 0, base = null;
+    const t0 = performance.now(), warm = Math.min(1500, dur * 0.2), end = t0 + dur;
+    const ctl = new AbortController();
+    const stop = () => ctl.abort();
+    signal.addEventListener('abort', stop);
+    const tick = setInterval(() => {
+      const now = performance.now();
+      if (!base && now - t0 >= warm) base = { b: bytes, t: now };
+      onRate(base ? mbps(bytes - base.b, now - base.t) : mbps(bytes, now - t0), Math.min(1, (now - t0) / dur));
+    }, 250);
+    const worker = async () => {
+      while (!ctl.signal.aborted && performance.now() < end) {
+        const ts = performance.now();
+        await fetch(s.up + (s.up.indexOf('?') >= 0 ? '&' : '?') + bust(), {
+          method: 'POST', mode: 'no-cors', cache: 'no-store', credentials: 'omit', body: blob, signal: ctl.signal
+        });
+        if (!bytes && performance.now() - ts < 50) throw new Error(t('spBadResp'));
+        bytes += CH;
+      }
+    };
+    const res = await Promise.allSettled(Array.from({ length: threads }, worker));
+    clearInterval(tick); signal.removeEventListener('abort', stop);
+    const now = performance.now();
+    if (!bytes) { const e = res.find((x) => x.status === 'rejected'); throw e && e.reason ? e.reason : new Error('upload failed'); }
+    return base && now - base.t > 300 ? mbps(bytes - base.b, now - base.t) : mbps(bytes, now - t0);
   }
 
   async function upload(s, threads, dur, signal, onRate) {
@@ -287,7 +330,8 @@
       if (signal.aborted) throw new DOMException('', 'AbortError');
       if (canUp(s)) {
         st.phase = 'up'; st.cur = 0; st.prog = 0; renderGauge();
-        try { st.up = await upload(s, Math.min(st.threads, 4), dur, signal, rate); } catch (e) { if (signal.aborted) throw e; st.up = null; }
+        try { st.up = await (s.up ? uploadOpaque : upload)(s, Math.min(st.threads, 4), dur, signal, rate); } catch (e) { if (signal.aborted) throw e; st.up = null; }
+        if (signal.aborted) throw new DOMException('', 'AbortError');
       }
       st.phase = 'done';
       hist.unshift({ id: s.id, ts: Date.now(), ping: st.ping.med, jitter: st.ping.jitter, down: st.down, up: st.up });
