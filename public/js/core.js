@@ -8,7 +8,7 @@
 
   const I18N = {
     zh: {
-      brand: 'IP 工具箱', brandSub: '本机 IP · 网络诊断 · 子网计算',
+      brand: 'IP妙妙工具箱', brandSub: '本机 IP · 网络诊断 · 子网计算',
       nav_home: '本机 IP', nav_split: '分流检测', nav_cdn: 'CDN 节点', nav_dns: 'DNS 出口',
       nav_webrtc: 'WebRTC', nav_query: 'IP 查询', nav_calc: 'IP 计算器',
       switchLang: '切换语言', switchTheme: '切换主题',
@@ -21,7 +21,7 @@
       t6to4: '6to4', tULA: '唯一本地 ULA', tGUA: '全球单播', tDiscard: '丢弃前缀', tIETF: 'IETF 协议分配', t6to4Relay: '6to4 中继'
     },
     en: {
-      brand: 'IP Toolbox', brandSub: 'My IP · Network diagnostics · Subnetting',
+      brand: 'IP Miaomiao Toolbox', brandSub: 'My IP · Network diagnostics · Subnetting',
       nav_home: 'My IP', nav_split: 'Split Tunnel', nav_cdn: 'CDN Nodes', nav_dns: 'DNS Egress',
       nav_webrtc: 'WebRTC', nav_query: 'IP Lookup', nav_calc: 'IP Calculator',
       switchLang: 'Switch language', switchTheme: 'Switch theme',

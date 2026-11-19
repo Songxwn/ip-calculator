@@ -1,6 +1,6 @@
-# IP 工具箱 · IP Toolbox
+# IP妙妙工具箱 · IP Miaomiao Toolbox
 
-纯静态、零依赖、零后端的 IP 工具箱，功能参考 [ip.skk.moe](https://ip.skk.moe/)，可直接部署到 Cloudflare Pages。
+纯静态、零依赖、零后端的 IP 工具站，功能参考 [ip.skk.moe](https://ip.skk.moe/)，可直接部署到 Cloudflare Pages。
 网络检测由浏览器直接请求第三方公开接口（CORS / JSONP），子网计算完全在本地完成。
 
 ## 页面（导航顺序）
