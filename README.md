@@ -12,6 +12,8 @@
 | DNS 出口 | `#/dns` | ip-api EDNS、ipleak.net、网易 NSTool 三路检测递归 DNS 出口，提示 DNS 泄露 |
 | WebRTC | `#/webrtc` | 多个 STUN 服务器的 UDP 出口与映射端口，对比网页出口提示 WebRTC 泄露 |
 | IP 查询 | `#/query?ip=` | 任意 IP / 域名（DoH 解析）在 11 个数据库中的归属对比 + RDAP 注册信息 |
+| 住宅 IP | `#/risk?ip=` | 跨境电商 / 社媒运营自查 IP 可信度：IPinfo、ipregistry、ipquery.io、ipapi.is 多库判定 IP 类型（住宅 / 移动 / 商业 / 机房）与 VPN、代理、Tor 等标记；8 个 DNSBL 黑名单；浏览器时区 / 语言与 IP 一致性；综合 0–100 可信度评分 |
+| 测速 | `#/speed` | 手动选择节点测速（延迟 / 抖动 / 下载 / 上传）。国内：山东大学、中科大、华科、西交、哈工大、上科大、上交、齐鲁工大、中科院软件所镜像站；国外：Cloudflare 与 LibreSpeed 公共服务器（东京、洛杉矶、纽约、伦敦、法兰克福等） |
 | IP 计算器 | `#/calc?q=` | 原子网计算器（位于导航最右侧） |
 
 ## 计算器功能
@@ -30,7 +32,7 @@ public/
   style.css       主题（浅色 / 深色）与组件样式
   js/core.js      i18n、主题、路由、BigInt IP 运算
   js/net.js       fetch / JSONP 封装、各数据源字段归一化、IATA 节点名
-  js/home.js split.js cdn.js dns.js webrtc.js query.js calc.js   各页面
+  js/home.js split.js cdn.js dns.js webrtc.js query.js risk.js speed.js calc.js   各页面
   _headers        安全头与 CSP
 ```
 

@@ -51,6 +51,8 @@
     <a class="nav-link" href="#/dns" data-route="dns" data-i18n="nav_dns">DNS 出口</a>
     <a class="nav-link" href="#/webrtc" data-route="webrtc" data-i18n="nav_webrtc">WebRTC</a>
     <a class="nav-link" href="#/query" data-route="query" data-i18n="nav_query">IP 查询</a>
+    <a class="nav-link" href="#/risk" data-route="risk" data-i18n="nav_risk">住宅 IP</a>
+    <a class="nav-link" href="#/speed" data-route="speed" data-i18n="nav_speed">测速</a>
     <a class="nav-link calc-link" href="#/calc" data-route="calc" data-i18n="nav_calc">IP 计算器</a>
   </nav>
 </header>
@@ -166,6 +168,70 @@
     <div id="qOut"></div>
   </section>
 
+  <!-- ============ Residential IP ============ -->
+  <section class="page" id="page-risk">
+    <div class="page-head">
+      <div><h1 data-i18n="riskTitle">住宅 IP 检测</h1><p class="muted" data-i18n="riskDesc"></p></div>
+    </div>
+    <form class="card q-form" id="rForm" autocomplete="off">
+      <div class="input-wrap">
+        <input id="rInput" class="big-input" type="text" spellcheck="false" autocapitalize="off" data-i18n-ph="riskPh">
+        <button class="ghost-btn wide" id="rMine" type="button" data-i18n="riskMine">检测本机</button>
+        <button class="btn" type="submit" data-i18n="riskBtn">检测</button>
+      </div>
+      <div class="input-msg" id="rMsg"></div>
+    </form>
+    <div id="rOut"></div>
+  </section>
+
+  <!-- ============ Speed test ============ -->
+  <section class="page" id="page-speed">
+    <div class="page-head">
+      <div><h1 data-i18n="speedTitle">网络测速</h1><p class="muted" data-i18n="speedDesc"></p></div>
+    </div>
+    <div class="sp-top">
+      <div class="card sp-gauge-card">
+        <div class="sp-node-cur" id="spNode"></div>
+        <div class="sp-gauge">
+          <svg viewBox="0 0 200 120" aria-hidden="true">
+            <path class="g-bg" d="M20 110 A80 80 0 0 1 180 110"/>
+            <path class="g-val" id="spArc" d="M20 110 A80 80 0 0 1 180 110" style="stroke-dasharray:251.3;stroke-dashoffset:251.3"/>
+          </svg>
+          <div class="sp-gauge-num"><b id="spVal">—</b><small>Mbps</small></div>
+        </div>
+        <div class="sp-phase" id="spPhase"></div>
+        <div class="sp-bar"><i id="spBar"></i></div>
+        <div class="sp-ctl">
+          <label class="muted"><span data-i18n="spThreads">线程</span>
+            <select class="field" id="spThreads"><option>1</option><option>2</option><option>4</option><option>6</option><option>8</option></select></label>
+          <label class="muted"><span data-i18n="spDur">时长</span>
+            <select class="field" id="spDur"><option value="5">5 s</option><option value="10">10 s</option><option value="15">15 s</option></select></label>
+          <button class="btn sp-start" id="spStart" type="button" data-i18n="spStart">开始测速</button>
+        </div>
+      </div>
+      <div class="sp-metrics">
+        <div class="card stat"><div class="k" data-i18n="spPing">延迟</div><div class="v" id="spMPing">—</div></div>
+        <div class="card stat"><div class="k" data-i18n="spJitter">抖动</div><div class="v" id="spMJit">—</div></div>
+        <div class="card stat"><div class="k" data-i18n="spDown">下载</div><div class="v dl" id="spMDown">—</div></div>
+        <div class="card stat"><div class="k" data-i18n="spUp">上传</div><div class="v ul" id="spMUp">—</div></div>
+      </div>
+    </div>
+    <div class="card block">
+      <div class="block-head"><h3 data-i18n="spCn">国内高校</h3><button class="btn secondary" id="spPingAll" type="button" data-i18n="spPingAll">测全部延迟</button></div>
+      <div class="sp-nodes" id="spCn"></div>
+      <h3 class="sp-sub" data-i18n="spIntl">国外开放测速点</h3>
+      <div class="sp-nodes" id="spIntl"></div>
+      <p class="note" data-i18n="spNote"></p>
+    </div>
+    <div class="card block" id="spHistWrap" hidden>
+      <div class="block-head"><h3 data-i18n="spHist">测速记录</h3><button class="link-btn" id="spClearHist" type="button" data-i18n="spClear">清除</button></div>
+      <div class="table-wrap plain"><table>
+        <thead><tr><th data-i18n="colNode">节点</th><th data-i18n="spPing">延迟</th><th data-i18n="spJitter">抖动</th><th data-i18n="spDown">下载</th><th data-i18n="spUp">上传</th><th data-i18n="colTime">时间</th></tr></thead>
+        <tbody id="spHist"></tbody>
+      </table></div>
+    </div>
+  </section>
+
   <!-- ============ Calculator ============ -->
   <section class="page" id="page-calc">
     <div class="page-head">
@@ -246,6 +312,8 @@
 <script src="js/dns.js" defer></script>
 <script src="js/webrtc.js" defer></script>
 <script src="js/query.js" defer></script>
+<script src="js/risk.js" defer></script>
+<script src="js/speed.js" defer></script>
 <script src="js/calc.js" defer></script>
 </body>
 </html>
