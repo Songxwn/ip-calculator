@@ -48,10 +48,18 @@ public/
 - Build command: *(留空)*
 - Build output directory: `public`
 
-### 方式 C：Wrangler CLI
+### 方式 C：Workers（Git 集成，静态资源）
+在 Workers & Pages → Create → **Workers** → Import a repository 中连接仓库：
+- Build command: *(留空)*
+- Deploy command: `npx wrangler deploy`
+
+`wrangler.toml` 已配置 `[assets] directory = "./public"`，会以纯静态资源 Worker 部署（`_headers` 同样生效）。
+
+### 方式 D：Wrangler CLI
 ```bash
 npx wrangler login
-npx wrangler pages deploy public --project-name ip-calculator
+npx wrangler deploy                                        # Workers 静态资源
+npx wrangler pages deploy public --project-name ip-calculator   # 或 Pages
 ```
 
 ## 本地预览
