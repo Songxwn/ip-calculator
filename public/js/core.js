@@ -292,9 +292,10 @@
   /* ---------------- Language ---------------- */
   function applyLang() {
     document.documentElement.lang = IPC.lang === 'zh' ? 'zh-CN' : 'en';
-    document.querySelectorAll('[data-i18n]').forEach((e) => { e.textContent = t(e.dataset.i18n); });
-    document.querySelectorAll('[data-i18n-title]').forEach((e) => { e.title = t(e.dataset.i18nTitle); e.setAttribute('aria-label', e.title); });
-    document.querySelectorAll('[data-i18n-ph]').forEach((e) => { e.placeholder = t(e.dataset.i18nPh); });
+    const tv = (k) => (I18N[IPC.lang] && I18N[IPC.lang][k]) || I18N.en[k];
+    document.querySelectorAll('[data-i18n]').forEach((e) => { const v = tv(e.dataset.i18n); if (v != null) e.textContent = v; });
+    document.querySelectorAll('[data-i18n-title]').forEach((e) => { const v = tv(e.dataset.i18nTitle); if (v != null) { e.title = v; e.setAttribute('aria-label', e.title); } });
+    document.querySelectorAll('[data-i18n-ph]').forEach((e) => { const v = tv(e.dataset.i18nPh); if (v != null) e.placeholder = v; });
     IPC.$('#langLabel').textContent = IPC.lang === 'zh' ? 'EN' : '中文';
     applyTheme();
     setTitle();

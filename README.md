@@ -45,6 +45,7 @@ public/
 - 路由切换时会同步更新 `<title>`、`description`、`og:title` / `og:description` 与 `og:locale`（见 `js/core.js` 的 `setTitle` / `setMeta`）。
 - 首页提供爬虫可见的「关于」与「常见问题」文本，并保留 `<noscript>` 兜底说明。
 - `robots.txt` 与 `sitemap.xml` 位于站点根目录；如果更换域名，请同步修改 canonical、`og:url` / `og:image`、JSON-LD、`sitemap.xml` 和 `robots.txt` 中的 `https://ip.songxwn.com/`。
+- 修改前端资源后请更新 `index.html` 中 `style.css` 与 `js/*.js` 的 `?v=` 版本号，避免浏览器或 CDN 继续使用旧缓存；`_headers` 已对 JS / CSS 设置为 `no-cache`。
 
 ## 部署到 Cloudflare Pages
 

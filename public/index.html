@@ -31,7 +31,7 @@
 <meta name="theme-color" content="#0b0d14" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=20261119">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -201,27 +201,27 @@
 
     <div class="card block about-card">
       <h3 data-i18n="aboutTitle">关于 IP妙妙工具箱</h3>
-      <p class="muted" data-i18n="aboutP1"></p>
-      <p class="muted" data-i18n="aboutP2"></p>
+      <p class="muted" data-i18n="aboutP1">这是一个纯静态、零后端的网络工具箱：所有检测都由浏览器直接请求第三方公开接口完成，子网计算在本地运行，不经过本站服务器，也不记录你的 IP。</p>
+      <p class="muted" data-i18n="aboutP2">支持本机 IPv4 / IPv6 查询、国内外出口与分流检测、CDN 节点、DNS 出口、WebRTC 检测、IP 归属与 ASN 查询、住宅 IP 可信度、网络测速和 IPv4 / IPv6 子网计算器，可切换中英文与深浅色主题。</p>
     </div>
 
     <div class="card block about-card faq-card">
       <h3 data-i18n="faqTitle">常见问题</h3>
       <details>
-        <summary data-i18n="faqQ1"></summary>
-        <p class="muted" data-i18n="faqA1"></p>
+        <summary data-i18n="faqQ1">这个网站会记录或上传我的 IP 吗？</summary>
+        <p class="muted" data-i18n="faqA1">不会。本站是纯静态页面，没有后端服务器：IP 查询、分流检测、DNS 出口和测速都由你的浏览器直接请求第三方公开接口，子网计算完全在本地完成，本站不经过、也不记录你的 IP。</p>
       </details>
       <details>
-        <summary data-i18n="faqQ2"></summary>
-        <p class="muted" data-i18n="faqA2"></p>
+        <summary data-i18n="faqQ2">为什么不同接口显示的 IP 不一样？</summary>
+        <p class="muted" data-i18n="faqA2">同一个网络可能有多个出口（多线、分流代理或 CDN 就近接入）。「本机 IP」页面会对比国内与国际接口看到的地址；如果两者不同，说明你的流量走了不同的出口，可继续用「分流检测」查看各网站的实际出口。</p>
       </details>
       <details>
-        <summary data-i18n="faqQ3"></summary>
-        <p class="muted" data-i18n="faqA3"></p>
+        <summary data-i18n="faqQ3">如何检查代理是否生效、有没有 DNS 或 WebRTC 泄露？</summary>
+        <p class="muted" data-i18n="faqA3">先看「本机 IP」确认出口地址与归属地，再用「DNS 出口」检查递归 DNS 解析位置，用「WebRTC」对比 UDP 出口与网页出口。三者位置不一致时，通常意味着存在 DNS 泄露或 WebRTC 绕过代理。</p>
       </details>
       <details>
-        <summary data-i18n="faqQ4"></summary>
-        <p class="muted" data-i18n="faqA4"></p>
+        <summary data-i18n="faqQ4">IP 计算器支持 IPv6 吗？可以离线使用吗？</summary>
+        <p class="muted" data-i18n="faqA4">支持。IP 计算器同时支持 IPv4 与 IPv6 的 CIDR / 掩码换算、地址范围与可用主机数计算，且全部在浏览器本地完成，断网也能正常使用。</p>
       </details>
     </div>
   </section>
@@ -452,17 +452,17 @@
 </footer>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="js/core.js" defer></script>
-<script src="js/net.js" defer></script>
-<script src="js/home.js" defer></script>
-<script src="js/split.js" defer></script>
-<script src="js/cdn.js" defer></script>
-<script src="js/dns.js" defer></script>
-<script src="js/webrtc.js" defer></script>
-<script src="js/query.js" defer></script>
-<script src="js/risk.js" defer></script>
-<script src="js/speed.js" defer></script>
-<script src="js/calc.js" defer></script>
-<script src="js/qr.js" defer></script>
+<script src="js/core.js?v=20261119" defer></script>
+<script src="js/net.js?v=20261119" defer></script>
+<script src="js/home.js?v=20261119" defer></script>
+<script src="js/split.js?v=20261119" defer></script>
+<script src="js/cdn.js?v=20261119" defer></script>
+<script src="js/dns.js?v=20261119" defer></script>
+<script src="js/webrtc.js?v=20261119" defer></script>
+<script src="js/query.js?v=20261119" defer></script>
+<script src="js/risk.js?v=20261119" defer></script>
+<script src="js/speed.js?v=20261119" defer></script>
+<script src="js/calc.js?v=20261119" defer></script>
+<script src="js/qr.js?v=20261119" defer></script>
 </body>
 </html>

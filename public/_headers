@@ -6,7 +6,7 @@
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://ipservice.ws.126.net https://whois.pconline.com.cn https://*.nstool.netease.com; connect-src 'self' https:; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
 
 /js/*
-  Cache-Control: public, max-age=3600, must-revalidate
+  Cache-Control: no-cache
 
 /*.css
-  Cache-Control: public, max-age=3600, must-revalidate
+  Cache-Control: no-cache
